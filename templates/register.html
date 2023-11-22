@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+{% with messages = get_flashed_messages() %}
+  {% if messages %}
+    <ul class="flashes">
+      {% for message in messages %}
+        <li>{{ message }}</li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+{% endwith %}
+
+<div class="row justify-content-md-center">
+  <div class="col-md-7 col-lg-5">
+    <h2 class="join-message">Join TheCocktailDB Club.</h2>
+
+    <form method="POST" id="user_form">
+      {{ form.hidden_tag() }}
+
+      {{ form.username.label(class="form-label") }}
+      {{ form.username(class="form-control", placeholder=form.username.label.text) }}
+      {% for error in form.username.errors %}
+        <span class="text-danger">{{ error }}</span>
+      {% endfor %}
+
+      {{ form.password.label(class="form-label") }}
+      {{ form.password(class="form-control", placeholder=form.password.label.text) }}
+      {% for error in form.password.errors %}
+        <span class="text-danger">{{ error }}</span>
+      {% endfor %}
+
+      <button class="btn btn-primary btn-block btn-lg">Register</button>
+    </form>
+  </div>
+</div>
+{% endblock %}

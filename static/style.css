@@ -1,0 +1,145 @@
+/* Set a primary color scheme */
+body {
+    font-family: 'Helvetica', sans-serif;
+    background-color: #f0f0f0;
+}
+
+h1 {
+    font-family: 'Georgia', serif;
+    color: #333;
+}
+
+/* Add space around the form */
+form {
+    margin: 20px;
+    padding: 20px;
+    background-color: #fff;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
+}
+
+/* Style the select box */
+select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background-color: #fff;
+}
+
+/* Style the submit button */
+button {
+    background-color: #007BFF;
+    color: #fff;
+    padding: 10px 20px;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+/* Add a hover effect to buttons */
+button:hover {
+    background-color: #0056b3;
+}
+
+/* Set a background image */
+body {
+    background-size: cover;
+    background-repeat: no-repeat;
+}
+
+
+@media (max-width: 768px) {
+    /* Adjust styles for smaller screens */
+    body {
+        font-size: 16px;
+    }
+
+    h1 {
+        font-size: 24px;
+    }
+
+    form {
+        margin: 10px;
+        padding: 10px;
+    }
+}
+
+/* Grid styles */
+.card-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr); 
+    gap: 20px; 
+    margin: 20px auto;
+}
+
+.card {
+    border: 1px solid #ddd;
+    padding: 10px;
+    text-align: center;
+}
+
+.card-image {
+    max-width: 100%;
+    height: auto;
+    display: block;
+    margin: 0 auto;
+    margin-bottom: 10px;
+    border-radius: 6px;
+}
+
+.card-image-modal {
+    width: 100px;
+    height: 100px;
+    border-radius: 6px;
+}
+
+.drink-image {
+    width: 150px;
+    height: 150px;
+    border-radius: 6px;
+}
+
+/* The Modal (background) */
+.drink-modal {
+    display: none; /* Hidden by default */
+    position: fixed; 
+    z-index: 1; 
+    padding-top: 100px; 
+    left: 0;
+    top: 0;
+    width: 100%; 
+    height: 100%; 
+    background-color: rgb(0, 0, 0);
+    background-color: rgba(0, 0, 0, 0.4);
+}
+
+/* Modal Content */
+.drink-modal-content { 
+    background-color: #fefefe;
+    margin: auto; 
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%;
+}
+
+/* The Close Button */
+.close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.drink-image-modal {
+    width: 150px;
+    height: 150px;
+    object-fit: cover;
+    border-radius: 6px;
+  }

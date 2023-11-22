@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TheCocktailDB Club</title>
+
+    <!-- Include Bootstrap CSS  -->
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container">
+            <a class="navbar-brand" href="#">TheCocktailDB Club</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ml-auto">
+                    {% if current_user.is_authenticated %}
+                        {% if request.endpoint in ['drinksearch', 'index'] %}
+                            <li class="nav-item">
+                                <a class="nav-link" href="/profile">Profile</a>
+                            </li>
+                        {% endif %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="/logout">Logout</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/drinksearch">Drink Search</a>
+                        </li>
+                    {% else %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="/login">Login</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/register">Sign Up</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/drinksearch">Drink Search</a>
+                    </li>
+                    {% endif %}
+                </ul>
+                
+            </div>
+        </div>
+    </nav>
+
+    <!-- Page Content -->
+    <div class="container mt-3">
+        <div class="row">
+            {% if current_user.is_authenticated %}
+                <h1>Hey {{ current_user.username }}, check these out!</h1>
+            
+            {% else %}
+                <div class="col-md-8"> 
+                    <h1>Welcome to TheCocktailDB Club</h1>
+                </div>
+        
+                <div class="col-md-4">
+                    <p>Sign up or login to get started!</p>
+                    <a href="/login" class="btn btn-primary">Login</a>
+                    <a href="/register" class="btn btn-primary">Sign Up</a>
+                </div>
+            {% endif %}
+        </div>
+        
+        <div class="row">
+            <div class="col-lg-12">
+                <h3>Explore Our Featured Categories</h3>
+                <!-- Add an id to the featured categories container -->
+                    <div id="featured-categories" class="btn-group">
+                        {% for category, label in featured_categories %}
+                            <a href="/drinksearch?category={{ category }}" class="btn btn-info featured-category" data-category="{{ category }}">{{ label }}</a>
+                        {% endfor %}
+                    </div>
+
+            </div>
+        </div>
+    </div>
+
+    <div class="container mt-5">
+        
+        <div class="row">
+            <div class="col-lg-12">
+                <h3>Featured Drinks</h3>
+                <div class="row" id="featured-drinks">
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Function to fetch and display featured drinks
+            function fetchFeaturedDrinks() {
+                const featuredDrinksContainer = $('#featured-drinks');
+                featuredDrinksContainer.empty(); // Clear the previous drinks (if any)
+
+                for (let i = 0; i < 3; i++) {
+                    $.get('https://www.thecocktaildb.com/api/json/v1/1/random.php', function(data) {
+                        const randomDrink = data.drinks[0];
+                        const drinkCard = `
+                            <div class="col-md-4">
+                                <div class="card">
+                                    <img src="${randomDrink.strDrinkThumb}" class="card-img-top" alt="${randomDrink.strDrink}">
+                                    <div class="card-body">
+                                        <h5 class="card-title">${randomDrink.strDrink}</h5>
+                                        <p class="card-text">${randomDrink.strInstructions}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                        featuredDrinksContainer.append(drinkCard);
+                    });
+                }
+            }
+        
+            // Function to fetch and display featured categories
+            function fetchFeaturedCategories() {
+                console.log('fetchFeaturedCategories function called');
+                $.get('https://www.thecocktaildb.com/api/json/v1/1/list.php?c=list', function(data) {
+                        
+                    const drinks = data.drinks; // Get all the drinks
+                    const randomDrinks = [];
+
+                    while (randomDrinks.length < 3) {
+                    const randomIndex = Math.floor(Math.random() * drinks.length);
+                    const randomDrink = drinks[randomIndex];
+
+                    if (!randomDrinks.includes(randomDrink)) {
+                        // Add the random drink to the array if it's not already in the randomDrinks array
+                        randomDrinks.push(randomDrink);
+                    }
+                    }
+
+                    const featuredCategoriesContainer = $('#featured-categories');
+                    randomDrinks.forEach(category => {
+                        const categoryLink = `<a href="/drinksearch?category=${category.strCategory}" class="btn btn-info">${category.strCategory}</a>`;
+                        featuredCategoriesContainer.append(categoryLink);
+                    });
+                });
+            }
+        
+            // Call the functions to fetch and display featured drinks and categories
+            fetchFeaturedDrinks();
+            console.log('fetchFeaturedDrinks function called');
+            fetchFeaturedCategories();
+            console.log('fetchFeaturedCategories function called');
+        });
+    </script>
+
+    
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const featuredCategories = document.querySelector('#featured-categories');
+  
+      if (featuredCategories) {
+        featuredCategories.addEventListener('click', function (event) {
+          const clickedElement = event.target.closest('.featured-category');
+          if (clickedElement) {
+            event.preventDefault();
+            const selectedCategory = clickedElement.getAttribute('data-category');
+            const featuredFilterBy = 'category'; // Use the category as the filter
+            const featuredDrink = selectedCategory; // Use the selected category as the search value
+  
+            // Update the hidden form inputs with the filter and search value
+            document.getElementById('featured-filter-by').value = featuredFilterBy;
+            document.getElementById('featured-drink').value = featuredDrink;
+  
+            // Trigger the form submission
+            document.getElementById('featured-drink-form').submit();
+          }
+        });
+      }
+    });
+  </script>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+
+
+</body>
+</html>

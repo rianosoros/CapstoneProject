@@ -1,0 +1,139 @@
+<!--drink search  -->
+{% extends 'base.html' %}
+
+{% block content %}
+{{ form.hidden_tag() }}
+
+    <div class="selected-category" style="display: none;">{{ selected_category }}</div>
+
+    <div class="container mt-5">
+      <h1 class="text-center">Drink Search</h1>
+      <p>Choose a filter to search for drinks and search away! </p>
+      <p>To view details about a drink, click on the drink image.</p>
+      <form id="drink-search-form" action="/drinksearch" method="POST">
+
+
+        <div class="row">
+          <div class="col-md-4">
+            <!-- <label for="filter-by">Filter By</label> -->
+            <select class="form-select" name="filter-by" id="filter-by" onchange="toggleDropdowns()">
+              <option value="drink-name">Drink Name</option>
+              <option value="ingredients">Ingredients</option>
+              <option value="glass-type">Glass Type</option>
+              <option value="category">Category</option>
+            </select>
+          </div>
+
+
+          <div class="col-md-4" id="dropdown-wrapper">
+
+            <input type="text" class="form-control" name="drink" id="drink" placeholder="Search for a drink">
+            <select class="form-select" name="ingredient" id="ingredient" size="1">
+              {% for ingredient, label in form.drink_ingredients.choices %}
+                  <option value="{{ ingredient }}">{{ label }}</option>
+              {% endfor %}
+            </select>
+
+            <select class="form-select" name="glass" id="glass" size="1">
+                <option value="">Select a glass type</option>
+                {% for glass, label in form.drink_glass.choices %}
+                    <option value="{{ glass }}">{{ label }}</option>
+                {% endfor %}
+            </select>
+
+            <select class="form-select" name="category" id="category" size="1">
+              <option value="">Select a category</option>
+                {% for category, label in form.drink_type.choices %}
+                    <option value="{{ category }}">{{ label }}</option>
+                {% endfor %}
+            </select>
+
+          </div>
+
+          <div class="col-md-4">
+            <button id="search-btn" class="btn btn-primary">Search</button>
+          </div>
+        </div>
+      </form>
+    </div>
+
+
+
+
+<!-- Display drink results as a grid of cards -->
+<div id="drink-results" class="card-grid">
+  {% for drink in results %}
+    <div class="card">
+      <img src="{{ drink.image_url }}" alt="{{ drink.name }}" class="card-image" data-id="{{ drink.id }}">
+      <h5 class="card-title">{{ drink.name }}</h5>
+      <p class="card-text">{{ drink.description }}</p>
+      <a href="/drink/{{ drink.id }}" class="btn btn-primary">View</a>
+      
+      {% if current_user.is_authenticated %}
+        <div id="liked-drinks-button" style="display: none;">
+          <button class="add-to-liked">Add to Liked Drinks</button>
+        </div>  
+      {% endif %}
+
+    </div>
+  {% endfor %}
+</div>
+
+<!-- Drink modal (initially hidden) -->
+<div class="drink-modal">
+  <div class="drink-modal-content">
+    <span class="close">&times;</span>
+    <div id="drink-modal-details">
+      <div class="row">
+        <div class="col-md-6">
+          <img id="drink-modal-image" src="" alt="" class="img-fluid drink-image-modal">
+        </div>
+        <div class="col-md-6">
+          <h3 id="drink-modal-name"></h3>
+          <p id="drink-modal-description"></p>
+          <h5>Ingredients</h5>
+          <ul id="drink-modal-ingredients" class="ingredients-modal"></ul>
+          <h5>Instructions</h5>
+          <p id="drink-modal-instructions"></p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- Hidden form for featured drinks -->
+<form id="featured-drink-form" action="/drinksearch" method="POST" style="display: none;">
+  <input type="hidden" name="filter-by" id="featured-filter-by" value="drink-name">
+  <input type="hidden" name="drink" id="featured-drink" value="">
+</form>
+
+
+<script>  
+function toggleDropdowns() {
+  const filterBy = document.getElementById('filter-by').value;
+  const dropdownWrapper = document.getElementById('dropdown-wrapper');
+
+  // Hide all dropdowns
+  document.getElementById('ingredient').style.display = 'none';
+  document.getElementById('glass').style.display = 'none';
+  document.getElementById('category').style.display = 'none';
+  document.getElementById('drink').style.display = 'none';
+
+  // Show the selected dropdown based on the filter
+  if (filterBy === 'ingredients') {
+    document.getElementById('ingredient').style.display = 'block';
+  } else if (filterBy === 'glass-type') {
+    document.getElementById('glass').style.display = 'block';
+  } else if (filterBy === 'category') {
+    document.getElementById('category').style.display = 'block';
+  } else if (filterBy === 'drink-name') {
+    document.getElementById('drink').style.display = 'block';
+  }
+}  
+toggleDropdowns();
+</script>
+
+<script src="{{ url_for('static', filename='script.js') }}"></script>
+
+{% endblock %}

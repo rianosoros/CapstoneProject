@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+
+{% block content %}
+{% with messages = get_flashed_messages() %}
+  {% if messages %}
+    <ul class="flashes">
+      {% for message in messages %}
+        <li>{{ message }}</li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+{% endwith %}
+
+<form action="index.html">
+    Redirecting to home page...
+    <input type="submit" value="Logout">
+</form>
+
+{% endblock %}

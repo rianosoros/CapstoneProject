@@ -1,0 +1,158 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <div class="container mt-5">
+    
+    <h2 class="text-center">Welcome back, {{ current_user.username }}!</h2> 
+    <p class="text-center">Want to add another drink? Click on the 'Drink Search' link in the navigation bar.</p>
+    <p class="text-center">To see drink details, click on a drink image!</p>
+    <h3 class="text-center">Your Liked Drinks</h3>
+  </div>
+
+  <div class="card-grid">
+    {% for liked_drink in liked_drinks %}
+    <div class="card">
+      {% set drink_detail = drink_details[loop.index0] %}
+      <img src="{{ drink_detail.strDrinkThumb }}" alt="{{ drink_detail.strDrink }}" class="card-image" data-id="{{ liked_drink.drink_id }}">
+      <h5 class="card-title">{{ drink_detail.strDrink }}</h5>
+      <button class="remove-from-liked" data-id="{{ liked_drink.drink_id }}">Remove</button>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+
+<!-- Drink modal (initially hidden) -->
+<div class="drink-modal">
+  <div class="drink-modal-content">
+    <span class="close">&times;</span>
+    <div id="drink-modal-details">
+      <div class="row">
+        <div class="col-md-6">
+          <img id="drink-modal-image" src="" alt="" class="img-fluid drink-image-modal">
+        </div>
+        <div class="col-md-6">
+          <h3 id="drink-modal-name"></h3>
+          <p id="drink-modal-description"></p>
+          <p id="drink-modal-ingredients"></p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  function createIngredientsList(drink) {
+    let ingredientsList = '';
+    for (let i = 1; i <= 15; i++) {
+      const ingredient = drink[`strIngredient${i}`];
+      if (ingredient) {
+        const measure = drink[`strMeasure${i}`] || '';
+        ingredientsList += ` - ${measure} ${ingredient}`;
+      }
+    }
+    return ingredientsList;
+  }
+  // Function to retrieve drink data from TheCocktailDB API based on drink_id
+  function getDrinkDataFromDrinkId(drinkId) {
+    // Construct the URL to fetch the drink details from TheCocktailDB API
+    const apiUrl = `https://www.thecocktaildb.com/api/json/v1/1/lookup.php?i=${drinkId}`;
+
+    // Use the fetch API to make the GET request to the API
+  return fetch(apiUrl)
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error(`Network response was not ok: ${response.status} - ${response.statusText}`);
+      }
+      return response.json();
+    })
+    .then((data) => {
+      // Log the data to the console to check what's being returned
+      console.log('API response data:', data);
+
+      // Extract the drink data from the response
+      const drink = data.drinks[0];
+      console.log('Drink data:', drink); // Log the extracted drink data
+
+      if (drink) {
+        // Return the relevant drink details
+        return {
+          image_url: drink.strDrinkThumb,
+          name: drink.strDrink,
+          description: drink.strInstructions,
+          ingredients: createIngredientsList(drink),
+        };
+      } else {
+        throw new Error('Drink not found.');
+      }
+    })
+    .catch((error) => {
+      console.error('Error fetching drink data:', error);
+    });
+}
+  // Get references to modal elements
+  const drinkModal = document.querySelector('.drink-modal');
+  const closeDrinkModal = drinkModal.querySelector('.close');
+
+  // Function to open the drink modal
+  function openDrinkModal(drinkData) {
+  document.getElementById('drink-modal-image').src = drinkData.image_url;
+  document.getElementById('drink-modal-name').textContent = drinkData.name;
+  document.getElementById('drink-modal-description').textContent = drinkData.description;
+  document.getElementById('drink-modal-ingredients').textContent = drinkData.ingredients;
+  // Add other modal content updates here
+
+  drinkModal.style.display = 'block';
+}
+
+
+  // Function to handle removing a drink from liked drinks
+  function removeFromLikedDrinks(drinkId, card) {
+    fetch(`/remove-from-liked/${drinkId}`, {
+      method: 'POST',
+    })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error(`Network response was not ok: ${response.status} - ${response.statusText}`);
+        }
+        return response.json();
+      })
+      .then(data => {
+        console.log('Drink removed from liked drinks:', data.message);
+        card.remove();
+      })
+      .catch(error => {
+        console.error('Error removing drink from liked drinks:', error);
+      });
+  }
+
+  // Event listener for clicking on the cards in the profile screen
+  const profileCards = document.querySelectorAll('.card');
+  profileCards.forEach(card => {
+    card.addEventListener('click', function (event) {
+
+      // Check if the click is on the remove button
+      if (event.target.classList.contains('remove-from-liked')) {
+        const drinkId = event.target.getAttribute('data-id');
+        removeFromLikedDrinks(drinkId, card);
+
+      } else {
+
+        // Click is on the card, not the remove button
+        const drinkId = card.querySelector('.card-image').getAttribute('data-id');
+        if (drinkId) {
+          getDrinkDataFromDrinkId(drinkId)
+            .then(drinkData => {
+              openDrinkModal(drinkData); 
+            });
+        }
+      }
+    });
+  });
+
+
+  // Event listener for closing the drink modal
+  closeDrinkModal.addEventListener('click', function () {
+    drinkModal.style.display = 'none';
+  });
+</script>
+{% endblock %}
