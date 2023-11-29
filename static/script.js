@@ -1,5 +1,4 @@
 
-
 document.addEventListener('DOMContentLoaded', function () {
   console.log('Document is ready.');
   const featuredCategories = document.getElementById('featured-categories');
@@ -72,8 +71,6 @@ function displayResults(results) {
     drinkResults.textContent = 'No drinks found.';
   }
 }
-
-
 
   // Event listener for the "Search" button click
   document.getElementById('search-btn').addEventListener('click', function () {
@@ -241,5 +238,13 @@ function displayResults(results) {
   }else{
     console.log("featuredCategories is null");
   }
+
+
+
+module.exports = {
+  createIngredientsList,
+  displayResults,
+  performSearch
+};
 
 });
