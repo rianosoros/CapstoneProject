@@ -1,4 +1,5 @@
-# CapstoneProject1
+# CapstoneProject1: TheCocktailDB Club
+
 1.  The primary goal of the website is to provide cocktail enthusiasts with a user-friendly platform to discover and save cocktail recipes based on their preferred ingredients. It should facilitate easy user registration, authentication, and the ability to create a personalized cocktail recipe collection.
 
 2. The website's target demographic will include individuals of legal drinking age (typically 21 and older) who have an interest in cocktails and mixology. Users may range from beginners looking for simple recipes to experienced bartenders seeking inspiration for unique creations.
